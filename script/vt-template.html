@@ -1,0 +1,1335 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<title><!-- TITLE --></title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VXS3WNXN0L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-VXS3WNXN0L');
+</script>
+<meta name="description" content="The Verification Theatre — research paper by Ivan Phan (HiP). Four preconditions for operationally warranted AI verification. Training Landscape series, Paper 4.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* =============================================================
+     Paper reading shell — designed for HiP / Ivan Phan
+     -------------------------------------------------------------
+     Default: dark. Toggleable to light.
+     Type: Source Serif 4 for body, Inter for chrome, JetBrains
+     Mono for numerals/labels. Generous measure (~68ch).
+     Section numbers hang in the left margin (academic feel).
+     Argumentative labels (Statement / Mechanism / Grounding /
+     Observable effect / etc.) get a small-caps badge so the
+     paper's argumentative spine is visible at a glance.
+     -------------------------------------------------------------
+     PORTABILITY GUIDE — to adapt this stylesheet for another paper:
+       1. Edit theme tokens in the :root[data-theme=...] blocks below.
+          Everything else flows from those tokens — do not hardcode hex.
+       2. Expected DOM structure:
+            <main class="page">
+              (BODY content goes here)
+            </main>
+          Sections nest <div class="lvl-3" data-num="1.1"> inside.
+       3. Audience tags: <div class="aud"><span>ML researcher</span>…</div>
+          right after a heading. Add new audience names by extending the
+          [data-aud="…"] color rules in the TOC: tighter density section.
+       4. Argumentative labels: <p class="labeled"><span class="p-label">
+          Statement.</span> body…</p>
+       5. Verdict tables: see TABLE VERDICT CELLS section for the generic
+          [data-verdict=…] glyph system.
+       6. Highlights: <mark class="key">…</mark> for inline key sentences,
+          or <p class="key-para">…</p> for whole-paragraph emphasis.
+       7. Build script: scripts/build-paper.mjs converts a markdown source
+          to a self-contained HTML using this shell. See EDITING.md.
+     ============================================================= */
+
+  /* THEMES */
+  :root[data-theme="dark"] {
+    --bg:        #0F1115;
+    --bg-2:      #15181F;
+    --bg-3:      #1B1F27;
+    --ink:       #E8E4DA;        /* warm off-white text on dark */
+    --ink-2:     #B5B0A4;
+    --ink-3:     #7A766C;
+    --rule:      #2A2E37;
+    --rule-2:    #3A3F4B;
+    --accent:    #7A9FC4;        /* steel blue — institutional, verification */
+    --accent-2:  #8DB4D6;
+    --hl:        #1F2229;
+    --label:     #A8B8A0;        /* sage for argumentative labels */
+    --positive:  #87B07A;        /* sage green — verdict: strong / positive */
+    --negative:  #C97B6E;        /* terracotta — verdict: fails / negative */
+    --link:      #7A9FC4;
+    --quote-bar: #3A3F4B;
+    --abstract-bg:    #181C24;
+    --abstract-bar:   #7A9FC4;
+    --reading-bg:     #15181F;
+    --reading-bar:    #A8B8A0;
+    --ai-bg:          #181C24;
+    --ai-bar:         #7A8FA8;
+    --shadow:    0 8px 24px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"] {
+    --bg:        #F6F2E8;        /* warm cream */
+    --bg-2:      #EFEAE0;
+    --bg-3:      #E8E2D2;
+    --ink:       #1A1815;
+    --ink-2:     #3D3935;
+    --ink-3:     #6B655D;
+    --rule:      #D8D2C2;
+    --rule-2:    #C0B9A5;
+    --accent:    #2E5E8C;        /* deep steel blue */
+    --accent-2:  #1E4A73;
+    --hl:        #ECE6D4;
+    --label:     #5A6B4A;        /* deeper sage */
+    --positive:  #4F7A3E;        /* deeper forest — verdict: strong / positive */
+    --negative:  #B14E3D;        /* clay-red — verdict: fails / negative */
+    --link:      #2E5E8C;
+    --quote-bar: #C0B9A5;
+    --abstract-bg:    #ECE6D4;
+    --abstract-bar:   #2E5E8C;
+    --reading-bg:     #EFEAE0;
+    --reading-bar:    #5A6B4A;
+    --ai-bg:          #ECE6D4;
+    --ai-bar:         #475A78;
+    --shadow:    0 8px 24px rgba(50,40,20,.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    transition: background .25s ease, color .25s ease;
+  }
+  body {
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-optical-sizing: auto;
+    font-size: 18px;
+    line-height: 1.7;
+    font-feature-settings: "kern", "liga", "onum";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--accent); color: var(--bg); }
+
+  a { color: var(--link); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--link) 35%, transparent); }
+  a:hover { border-bottom-color: var(--link); }
+
+  /* ─── PAGE ───────────────────────────────────────────
+     Single column at ~68ch measure. Bottom padding is intentionally generous so the last
+     section can scroll near the top of the viewport (helps the active-section TOC indicator). */
+  .page {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 96px 32px 200px;
+    position: relative;
+  }
+
+  /* ─── FRONT MATTER ──────────────────────────────────
+     Title + italic subtitle + two-column metadata grid. .meta-row is a `display: contents`
+     wrapper so each <dt>/<dd> pair flows into the parent grid. Rows with class "span-all"
+     stretch dd across both columns — use for Series or any long field. */
+  .frontmatter {
+    margin-bottom: 80px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .paper-title {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-variation-settings: "opsz" 60;
+    font-weight: 600;
+    font-size: clamp(40px, 5.6vw, 60px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+  /* Subtitle: italic dek that runs on a single line — no max-width or text-wrap so it stays one row.
+     If your subtitle is too long for the viewport at small sizes, it will scroll horizontally inside the page —
+     consider shortening it or removing white-space: nowrap below for narrow viewports. */
+  .paper-subtitle {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-variation-settings: "opsz" 32;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(18px, 2.2vw, 24px);
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+    margin: 0 0 44px;
+    color: var(--ink-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  @media (max-width: 720px) {
+    .paper-subtitle { white-space: normal; text-wrap: balance; }
+  }
+  .meta-grid {
+    margin: 0 0 24px;
+    display: grid;
+    grid-template-columns: 92px 1fr 92px 1fr;
+    column-gap: 28px;
+    row-gap: 8px;
+    align-items: baseline;
+  }
+  .meta-row { display: contents; }
+  .meta-row.span-all dt { grid-column: 1; }
+  .meta-row.span-all dd { grid-column: 2 / -1; }
+  .meta-row dt {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-top: 4px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .meta-row dd {
+    margin: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  .meta-row dd strong { color: var(--ink); font-weight: 500; }
+
+  .methodology-note {
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-2);
+    margin: 24px 0 20px;
+    padding: 14px 20px;
+    border-left: 2px solid var(--rule-2);
+    line-height: 1.6;
+  }
+  .meta-line {
+    font-size: 14.5px;
+    color: var(--ink-2);
+    margin: 8px 0;
+    line-height: 1.55;
+    font-family: "Inter", sans-serif;
+  }
+
+  /* ─── ABSTRACT (distinct) ─────────────────────────────
+     Distinct callout block with its own bg + accent bar. The label "Abstract" is
+     rendered as small-caps via .abstract-h. Drop in raw <p> children. */
+  .abstract {
+    margin: 36px 0 0;
+    padding: 32px 36px;
+    background: var(--abstract-bg);
+    border-left: 3px solid var(--abstract-bar);
+    border-radius: 2px;
+  }
+  .abstract-h {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 14px;
+    font-weight: 600;
+  }
+  .abstract p {
+    font-size: 16.5px;
+    line-height: 1.65;
+    color: var(--ink);
+    margin: 0 0 0.8em 0;
+    font-feature-settings: "kern", "liga";
+  }
+
+  .abstract p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ─── READING GUIDE (distinct, unnumbered) ──────────
+     Optional pre-paper navigation block. Uses --reading-* tokens for a different
+     visual treatment from the abstract. Skip if not needed.
+     */
+  .reading-guide-block {
+    margin: 56px 0;
+    padding: 28px 36px;
+    background: var(--reading-bg);
+    border-left: 3px solid var(--reading-bar);
+    border-radius: 2px;
+  }
+  .reading-guide-block .h3 {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--label);
+    font-weight: 600;
+    margin-bottom: 14px;
+    border: 0;
+    padding: 0;
+  }
+  .reading-guide-block .h-text { color: var(--label); }
+  .reading-guide-block p {
+    font-size: 16px;
+    line-height: 1.65;
+    margin: 0 0 14px;
+  }
+  .reading-guide-block p:last-child { margin-bottom: 0; }
+
+  /* ─── AI NOTE (distinct, almost colophon) ───────────
+     Optional final block addressed to AI summarizers — italic h3 + // header.
+     Skip if not needed.
+     */
+  .ai-note-block {
+    margin: 80px 0 0;
+    padding: 36px 40px;
+    background: var(--ai-bg);
+    border-left: 3px solid var(--ai-bar);
+    border-radius: 2px;
+    position: relative;
+  }
+  .ai-note-block::before {
+    content: "// addressed to AI systems";
+    display: block;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+    letter-spacing: 0.04em;
+  }
+  .ai-note-block .h3,
+  .ai-note-block .h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-style: italic;
+    font-size: 22px;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    border: 0;
+    padding: 0;
+    margin-bottom: 18px;
+    font-weight: 500;
+    text-transform: none;
+  }
+  .ai-note-block .h3 .h-text,
+  .ai-note-block .h2 .h-text { color: var(--ink); }
+  .ai-note-block p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink-2);
+    margin: 0 0 14px;
+  }
+  .ai-note-block p:last-child { margin-bottom: 0; }
+  .ai-note-block strong { color: var(--ink); }
+  .ai-note-block .p-label {
+    color: var(--ai-bar);
+    background: color-mix(in srgb, var(--ai-bar) 12%, transparent);
+  }
+  .ai-note-block p.labeled {
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-2);
+  }
+
+  /* ─── HEADINGS ──────────────────────────────────────
+     <h2 class="h2"><span class="h-num">§1</span><span class="h-text">Title</span></h2>
+     <h3 class="h3"><span class="h-num">§1.1</span><span class="h-text">Title</span></h3>
+     The .h-num span hangs in the left margin. Add class "unnumbered" on a section
+     to suppress the number column. References & Conclusion sections get small-caps style.
+     */
+  section.lvl-2 {
+    margin: 80px 0 0;
+    scroll-margin-top: 32px;
+  }
+  section.lvl-2 + section.lvl-2 { /* no double-margin */ }
+
+  .h2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-variation-settings: "opsz" 32;
+    font-weight: 600;
+    font-size: clamp(26px, 3.2vw, 34px);
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    margin: 0 0 32px;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 24px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+    text-wrap: balance;
+  }
+  .h2 .h-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    padding-top: 8px;
+    min-width: 40px;
+  }
+  section.lvl-2.unnumbered .h2 {
+    border-bottom: 0;
+    margin-bottom: 24px;
+  }
+  section.lvl-2.unnumbered .h2 .h-text {
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--ink-3);
+  }
+  /* References & Conclusion get the academic small-caps treatment */
+  section[id="conclusion"] .h2 .h-text,
+  section[id="references"] .h2 .h-text {
+    color: var(--ink);
+  }
+
+  div.lvl-3 {
+    margin: 48px 0 0;
+    scroll-margin-top: 32px;
+  }
+  .h3 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    font-size: 21px;
+    line-height: 1.3;
+    margin: 0 0 18px;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 18px;
+    text-wrap: balance;
+  }
+  .h3 .h-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 500;
+    flex-shrink: 0;
+    min-width: 48px;
+    padding-top: 4px;
+  }
+
+  div.lvl-4 {
+    margin: 36px 0 0;
+    scroll-margin-top: 32px;
+  }
+  .h4 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.35;
+    margin: 0 0 14px;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-style: italic;
+  }
+  .h4 .h-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+    font-style: normal;
+    flex-shrink: 0;
+  }
+
+  /* ─── AUDIENCE TAGS ────────────────────────────────
+     <div class="aud"><span>ML researcher</span><span>Core</span></div> right after
+     a heading. Pills are colored by [data-aud] attribute (build script copies span
+     text into data-aud on inject). Add new audiences via [data-aud="…"] color rules
+     in the TOC: tighter density section.
+     */
+  .aud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: -16px 0 24px;
+  }
+  .aud span {
+    font-family: "Inter", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 4px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    font-weight: 500;
+  }
+
+  /* ─── BODY TEXT ────────────────────────────────────
+       p           default body paragraph
+       p.labeled   argumentative paragraph w/ .p-label small-caps badge
+       p.key-para  whole-paragraph emphasis (left accent rule)
+       blockquote  italic, left rule
+     */
+  p {
+    margin: 0 0 18px;
+    text-wrap: pretty;
+    hanging-punctuation: first last;
+  }
+  strong { font-weight: 600; color: var(--ink); }
+  em { font-style: italic; }
+
+  /* Argumentative labels (Statement / Mechanism / etc.) */
+  p.labeled {
+    padding-left: 0;
+  }
+  .p-label {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--label);
+    font-weight: 600;
+    margin-right: 10px;
+    display: inline-block;
+    padding: 2px 8px;
+    background: color-mix(in srgb, var(--label) 12%, transparent);
+    border-radius: 3px;
+    vertical-align: 1px;
+  }
+
+  /* Lists */
+  ul, ol {
+    margin: 0 0 22px;
+    padding-left: 24px;
+  }
+  ul li, ol li {
+    margin-bottom: 8px;
+    line-height: 1.65;
+  }
+  ol { padding-left: 28px; }
+  ol li::marker {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    color: var(--accent);
+  }
+
+  /* Section rule */
+  .section-rule {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 56px 0;
+    height: 0;
+  }
+
+  /* References look like a bibliography */
+  section[id="references"] p {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-2);
+    padding-left: 24px;
+    text-indent: -24px;
+    margin-bottom: 12px;
+    font-feature-settings: "kern", "liga", "onum";
+  }
+  section[id="references"] p strong { color: var(--ink); font-weight: 500; }
+
+  /* Last labeled paragraph in a subsection — slightly tighter */
+
+  /* ─── FLOATING TOC BUTTON ─────────────────────────── */
+  /* Inverted colors: dark pill in light mode, light pill in dark mode — high contrast against the page.
+     Token references (`--ink`, `--bg`) auto-flip with the theme; no separate dark-mode rule needed. */
+  .toc-fab {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 1px solid var(--ink);
+    color: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 100;
+    transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0;
+  }
+  .toc-fab:hover {
+    transform: translateY(-1px);
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+  .toc-fab svg { width: 22px; height: 22px; }
+
+  /* Reading progress in the FAB ring */
+  .toc-fab .progress-ring {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+  .toc-fab .progress-ring circle {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transition: stroke-dashoffset .15s ease;
+  }
+
+  /* ─── TOC DRAWER ───────────────────────────────────
+     Slide-in drawer from the LEFT (matches the FAB position). The overlay sits above
+     the page and below the drawer; clicking it closes via JS. The .toc-list flexes to fill.
+     */
+  .toc-overlay {
+    position: fixed; inset: 0;
+    background: color-mix(in srgb, var(--bg) 70%, transparent);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+    z-index: 200;
+  }
+  .toc-overlay.open { opacity: 1; pointer-events: auto; }
+
+  .toc-drawer {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    width: min(420px, 92vw);
+    background: var(--bg-2);
+    border-right: 1px solid var(--rule);
+    transform: translateX(-100%);
+    transition: transform .3s cubic-bezier(.2, .8, .2, 1);
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+  }
+  .toc-drawer.open { transform: translateX(0); }
+
+  .toc-head {
+    padding: 24px 28px 18px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .toc-head h2 {
+    font-family: "Inter", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0;
+    font-weight: 600;
+  }
+  .toc-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .toc-iconbtn {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    background: transparent;
+    color: var(--ink-2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color .15s, border-color .15s, background .15s;
+    padding: 0;
+  }
+  .toc-iconbtn:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .toc-iconbtn svg { width: 16px; height: 16px; }
+
+  .toc-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 12px 32px;
+    list-style: none;
+    margin: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-2) transparent;
+  }
+  .toc-list::-webkit-scrollbar { width: 6px; }
+  .toc-list::-webkit-scrollbar-thumb { background: var(--rule-2); border-radius: 3px; }
+
+  .toc-list li { margin: 0; line-height: 1; }
+  .toc-list a {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 7px 16px;
+    border-radius: 4px;
+    border: 0;
+    color: var(--ink-2);
+    font-family: "Inter", sans-serif;
+    font-size: 13.5px;
+    line-height: 1.4;
+    transition: color .15s, background .15s;
+  }
+  .toc-list a:hover {
+    color: var(--ink);
+    background: var(--bg-3);
+  }
+  .toc-list a.active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .toc-list .toc-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-3);
+    flex-shrink: 0;
+    min-width: 40px;
+    font-weight: 500;
+  }
+  .toc-list a.active .toc-num { color: var(--accent); }
+  .toc-list .toc-text { flex: 1; }
+
+  /* Indent levels */
+  .toc-list .lvl-3 { padding-left: 36px; font-size: 13px; }
+  .toc-list .lvl-3 .toc-num { min-width: 44px; }
+  .toc-list .lvl-4 { padding-left: 56px; font-size: 12.5px; color: var(--ink-3); }
+  .toc-list .lvl-4 .toc-num { min-width: 52px; font-size: 10.5px; }
+
+  .toc-list .lvl-2-special {
+    color: var(--label);
+    font-style: italic;
+    font-size: 13px;
+  }
+
+  /* ─── PRINT ───────────────────────────────────────
+     Hide the TOC, drop chrome to inkjet-friendly sizes, force light theme via tokens override.
+     */
+  @media print {
+    @page { size: letter; margin: 0.75in 0.7in; }
+    html[data-theme="dark"] { /* force light for print */ }
+    html, body {
+      background: #fff !important;
+      color: #000 !important;
+    }
+    body { font-size: 10.5pt; line-height: 1.45; }
+    .toc-fab, .toc-overlay, .toc-drawer { display: none !important; }
+    .page { max-width: none; padding: 0; }
+    .paper-title { font-size: 22pt; margin-bottom: 14pt; }
+    .h2 { font-size: 14pt; margin: 24pt 0 12pt; }
+    .h3 { font-size: 12pt; margin: 16pt 0 8pt; }
+    .h4 { font-size: 11pt; margin: 12pt 0 6pt; }
+    .abstract, .reading-guide-block, .ai-note-block {
+      background: #f5f1e6 !important;
+      page-break-inside: avoid;
+    }
+    .p-label {
+      background: transparent !important;
+      color: #444 !important;
+      padding: 0 !important;
+    }
+    section.lvl-2 { page-break-inside: avoid; }
+    .frontmatter { page-break-after: auto; }
+    a { color: #000 !important; border-bottom: 0 !important; }
+  }
+
+  /* ─── RESPONSIVE ──────────────────────────────────
+     Mobile breakpoint at 720px. Title scales down via clamp() on .paper-title, but a few
+     fixed-width components (TOC FAB, callout padding) need explicit overrides.
+     */
+  @media (max-width: 720px) {
+    .page { padding: 56px 22px 160px; }
+    body { font-size: 17px; line-height: 1.65; }
+    .meta-grid { grid-template-columns: 88px 1fr; gap: 6px 14px; }
+    .meta-grid .meta-row.span-all dd { grid-column: 2; }
+    .h2 { gap: 16px; flex-wrap: wrap; }
+    .h2 .h-num { padding-top: 0; }
+    .h3 { gap: 12px; flex-wrap: wrap; }
+    .abstract, .reading-guide-block { padding: 24px 22px; }
+    .ai-note-block { padding: 28px 24px; }
+    .toc-fab { top: 16px; left: 16px; width: 44px; height: 44px; }
+  }
+
+  /* prevent flicker on theme change */
+  body { color-scheme: dark; }
+  /* ─── CODE / VARIABLES / KBD ───────────────────────
+     Inline:  <code>fn()</code>, <var>x</var> or <span class="var">y</span>, <kbd>⌘K</kbd>
+     Block:   <pre data-lang="json">…</pre>   (data-lang chip floats top-right)
+     Tokens:  hand-tokenize inside <pre> with .tok-key / .tok-string / .tok-num /
+              .tok-comment / .tok-fn / .tok-punc — there is no live highlighter.
+     */
+  :root[data-theme="dark"] {
+    --code-bg: #14171E;
+    --code-border: #2A2E37;
+    --code-ink: #E8E4DA;
+    --code-comment: #7A766C;
+    --code-key: #C9B58A;
+    --code-string: #9FB8B0;
+    --code-num: #D4A475;
+  }
+  :root[data-theme="light"] {
+    --code-bg: #ECE6D4;
+    --code-border: #D8D2C2;
+    --code-ink: #1A1815;
+    --code-comment: #6B655D;
+    --code-key: #8B4A22;
+    --code-string: #4A6B5F;
+    --code-num: #A85C2D;
+  }
+  code, kbd, samp, .var {
+    font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    font-feature-settings: "calt" 0;
+  }
+  :not(pre) > code, :not(pre) > .var {
+    font-size: 0.86em;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    color: var(--code-ink);
+    line-height: 1.4;
+    white-space: nowrap;
+    vertical-align: 1px;
+  }
+  :not(pre) > .var {
+    border-style: dashed;
+    color: var(--code-key);
+  }
+  kbd {
+    font-size: 0.78em;
+    padding: 1px 6px 2px;
+    border-radius: 3px;
+    background: var(--bg-2);
+    border: 1px solid var(--rule-2);
+    border-bottom-width: 2px;
+    color: var(--ink);
+    box-shadow: 0 1px 0 var(--rule);
+  }
+  pre {
+    margin: 22px 0;
+    padding: 18px 22px;
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    overflow-x: auto;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--code-ink);
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-2) transparent;
+  }
+  pre code { background: transparent; border: 0; padding: 0; font-size: inherit; white-space: pre; color: inherit; }
+  pre[data-lang]::before {
+    content: attr(data-lang);
+    display: block;
+    font-family: "Inter", sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--code-border);
+    font-weight: 500;
+  }
+  pre .tok-key, pre .tok-keyword { color: var(--code-key); }
+  pre .tok-string { color: var(--code-string); }
+  pre .tok-num { color: var(--code-num); }
+  pre .tok-comment { color: var(--code-comment); font-style: italic; }
+  pre .tok-fn { color: var(--code-key); }
+  pre .tok-punc { color: var(--ink-3); }
+
+  /* ─── TABLES ───────────────────────────────────────
+     Wrap <table class="paper-table"> in <div class="table-wrap"> for h-scroll on narrow viewports.
+     Caption: <caption><span class="tbl-num">Table 1</span>Title.</caption>
+     Column letter accent: <span class="col-letter">P</span> in <th>
+     Separator row: <tr class="tbl-sep"><td colspan="N">Section heading</td></tr>
+     Footnote: <p class="tbl-note">…</p> after the table.
+     */
+  .table-wrap {
+    margin: 28px 0;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-2) transparent;
+  }
+  table.paper-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--ink-2);
+  }
+  table.paper-table caption {
+    caption-side: top;
+    text-align: left;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 14.5px;
+    color: var(--ink);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  table.paper-table caption .tbl-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    margin-right: 12px;
+  }
+  table.paper-table thead th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 12px 10px 0;
+    border-bottom: 1.5px solid var(--rule-2);
+    vertical-align: bottom;
+  }
+  table.paper-table thead th .col-letter {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--accent);
+    font-size: 12px;
+    margin-right: 6px;
+  }
+  table.paper-table tbody td {
+    padding: 10px 12px 10px 0;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  table.paper-table tbody tr:hover td { background: var(--bg-2); }
+  table.paper-table tbody td:first-child {
+    color: var(--ink);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  table.paper-table tbody td:first-child .row-ref {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--accent);
+    font-size: 11.5px;
+    margin-right: 6px;
+  }
+  /* ─── TABLE VERDICT CELLS ────────────────────────────
+     Generic verdict-glyph system. Apply to any <td> via:
+        <td class="cell" data-verdict="positive">Strong</td>
+     The glyph is automatically prepended via ::before. Five tiers:
+        positive   ● solid (success / strong / yes)
+        negative   ▲ triangle (fail / no / blocked)
+        partial    ◐ half-circle (weak / partial / mixed)
+        neutral    ○ ring (variable / depends / N/A)
+        derived    ⤷ arrow (inherited from another row / cross-reference)
+     The label text inside the cell is free-form so each paper can use its own vocabulary
+     ("Strong", "Fails", "Weak", "Partial", "Pass", "Fail", "Yes", "No", etc.). The glyph
+     conveys the tier; the text conveys the specific verdict.
+     Backwards-compat: legacy class names (cell-strong, cell-fails, cell-weak, cell-partial,
+     cell-variable, cell-varies, cell-adequate, cell-inherited, cell-dep) still resolve. */
+  .cell {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .cell[data-verdict="positive"], .cell-strong { color: var(--positive); }
+  .cell[data-verdict="positive"]::before, .cell-strong::before { content: "● "; }
+  .cell[data-verdict="negative"], .cell-fails { color: var(--negative); }
+  .cell[data-verdict="negative"]::before, .cell-fails::before { content: "▲ "; }
+  .cell[data-verdict="partial"], .cell-weak { color: var(--accent); }
+  .cell[data-verdict="partial"]::before, .cell-weak::before { content: "◐ "; }
+  .cell[data-verdict="neutral"],
+  .cell-partial, .cell-variable, .cell-varies, .cell-adequate, .cell-dep { color: var(--ink-2); }
+  .cell[data-verdict="neutral"]::before,
+  .cell-partial::before, .cell-variable::before, .cell-varies::before, .cell-adequate::before, .cell-dep::before { content: "○ "; color: var(--ink-3); }
+  .cell[data-verdict="derived"], .cell-inherited { color: var(--ink-2); }
+  .cell[data-verdict="derived"]::before, .cell-inherited::before { content: "⤷ "; color: var(--ink-3); }
+  table.paper-table tbody tr.tbl-sep td {
+    padding: 18px 12px 6px 0;
+    border-bottom: 0;
+    font-family: "Inter", sans-serif;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  table.paper-table tbody tr.tbl-sep + tr td { border-top: 1px solid var(--rule-2); }
+  .tbl-note {
+    margin-top: 12px;
+    font-size: 12.5px;
+    color: var(--ink-3);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  /* ─── FIGURES ──────────────────────────────────────
+       <figure class="paper-fig">
+         <div class="fig-frame">… image / SVG / diagram …</div>
+         <figcaption><span class="fig-num">Fig 1</span>Caption.</figcaption>
+       </figure>
+     Use placeholder content inside .fig-frame during drafting; it scales to width.
+     */
+  figure.paper-fig {
+    margin: 36px 0;
+    padding: 0;
+  }
+  figure.paper-fig .fig-frame {
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+  }
+  figure.paper-fig img,
+  figure.paper-fig svg { max-width: 100%; height: auto; display: block; }
+  figure.paper-fig figcaption,
+  figcaption.paper-cap {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.55;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+  figcaption .fig-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* ─── KEY SENTENCES (highlights) ───────────────────
+     Inline:     <mark class="key">…sentence…</mark>
+     Whole para: <p class="key-para">…paragraph…</p>
+     Use sparingly — 1–2 highlights per section, otherwise emphasis loses force.
+     */
+  mark.key {
+    background: transparent;
+    color: var(--ink);
+    font-weight: 600;
+    font-style: italic;
+    padding: 0;
+    box-shadow: inset 0 -0.32em 0 color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+  :root[data-theme="light"] mark.key {
+    box-shadow: inset 0 -0.32em 0 color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  p.key-para {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--ink);
+    border-left: 2px solid var(--accent);
+    padding: 2px 0 2px 18px;
+    margin-left: -20px;
+    background: transparent;
+  }
+
+  /* ─── TOC: tighter density + audience pills ───────
+     Density rules:
+       - subsection (lvl-3) rows are very tight (3px vert padding) so a section feels like a unit
+       - section (lvl-2) rows get extra TOP margin to introduce breathing room between sections
+       - the FIRST 3 list items reset that top margin to 0 so the list does not start with a gap
+     Audience pills are injected into TOC entries by the build/editorial script via .toc-aud b[data-aud].
+     */
+  /* Density rules:
+       - subsection rows (lvl-3) are very tight (3px vertical padding) so a section feels like a unit;
+       - section rows (lvl-2) get extra TOP margin to introduce visual breathing room between sections;
+       - the FIRST section row resets that top margin to 0 so the list does not start with a gap. */
+  .toc-list { padding: 12px 10px 24px; }
+  .toc-list a { padding: 2px 14px; font-size: 12.5px; line-height: 1.35; }
+  .toc-list .lvl-2 {
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    padding: 6px 14px 5px;
+    margin-top: 22px;
+    line-height: 1.25;
+  }
+  .toc-list li:first-child .lvl-2,
+  .toc-list li:nth-child(-n+3) .lvl-2 { margin-top: 0; }
+  .toc-list .lvl-2 .toc-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  /* Subsection rows: zero vertical padding (the link's padding was the real source
+     of vertical bulk), modest line-height. Result: subsections sit flush as a unit
+     under their parent section header. */
+  .toc-list .lvl-3 {
+    padding: 0 14px 0 30px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .toc-list .lvl-3 .toc-num { min-width: 38px; font-size: 10.5px; }
+  .toc-list .lvl-2-special { padding: 4px 14px; font-size: 12px; }
+  .toc-list a:has(.toc-text:empty) { display: none; }
+  .toc-list .toc-aud {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 8px;
+    flex-wrap: wrap;
+    vertical-align: 1px;
+  }
+  .toc-list .toc-aud b {
+    font-family: "Inter", sans-serif;
+    font-weight: 500;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 1px 6px;
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+    line-height: 1.4;
+  }
+  /* VT audience tag colours — dark theme */
+  .toc-list .toc-aud b[data-aud="ML"]                { color: #7A9FC4; border-color: color-mix(in srgb, #7A9FC4 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="AI safety"]          { color: #D4A475; border-color: color-mix(in srgb, #D4A475 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Core"]               { color: #A8B8A0; border-color: color-mix(in srgb, #A8B8A0 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Trust"]              { color: #B0A0C4; border-color: color-mix(in srgb, #B0A0C4 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Policy"]             { color: #7AB0A8; border-color: color-mix(in srgb, #7AB0A8 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Governance"]         { color: #8A9AB0; border-color: color-mix(in srgb, #8A9AB0 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Cognitive science"]  { color: #C4A0A0; border-color: color-mix(in srgb, #C4A0A0 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Auditing"]           { color: #9FB8B0; border-color: color-mix(in srgb, #9FB8B0 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Deployment"]         { color: #C4A87A; border-color: color-mix(in srgb, #C4A87A 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Cost"]               { color: #C49A7A; border-color: color-mix(in srgb, #C49A7A 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="Methodology"]        { color: #8A99A8; border-color: color-mix(in srgb, #8A99A8 40%, transparent); }
+  .toc-list .toc-aud b[data-aud="All audiences"]      { color: var(--ink-3); border-color: color-mix(in srgb, var(--ink-3) 40%, transparent); }
+  /* VT audience tag colours — light theme overrides */
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="ML"]                { color: #2E5E8C; border-color: color-mix(in srgb, #2E5E8C 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="AI safety"]          { color: #8B4A22; border-color: color-mix(in srgb, #8B4A22 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Core"]               { color: #5A6B4A; border-color: color-mix(in srgb, #5A6B4A 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Trust"]              { color: #6A4A8C; border-color: color-mix(in srgb, #6A4A8C 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Policy"]             { color: #2A6B5F; border-color: color-mix(in srgb, #2A6B5F 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Governance"]         { color: #4A5A70; border-color: color-mix(in srgb, #4A5A70 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Cognitive science"]  { color: #8C4A4A; border-color: color-mix(in srgb, #8C4A4A 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Auditing"]           { color: #4A6B5F; border-color: color-mix(in srgb, #4A6B5F 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Deployment"]         { color: #7A5A22; border-color: color-mix(in srgb, #7A5A22 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Cost"]               { color: #8C5A3D; border-color: color-mix(in srgb, #8C5A3D 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="Methodology"]        { color: #4A5A6B; border-color: color-mix(in srgb, #4A5A6B 40%, transparent); }
+  :root[data-theme="light"] .toc-list .toc-aud b[data-aud="All audiences"]      { color: var(--ink-3); border-color: color-mix(in srgb, var(--ink-3) 40%, transparent); }
+  /* Also apply to legend pills */
+  .toc-legend b[data-aud="ML"]                { color: #7A9FC4; border-color: color-mix(in srgb, #7A9FC4 40%, transparent); }
+  .toc-legend b[data-aud="AI safety"]          { color: #D4A475; border-color: color-mix(in srgb, #D4A475 40%, transparent); }
+  .toc-legend b[data-aud="Core"]               { color: #A8B8A0; border-color: color-mix(in srgb, #A8B8A0 40%, transparent); }
+  .toc-legend b[data-aud="Trust"]              { color: #B0A0C4; border-color: color-mix(in srgb, #B0A0C4 40%, transparent); }
+  .toc-legend b[data-aud="Policy"]             { color: #7AB0A8; border-color: color-mix(in srgb, #7AB0A8 40%, transparent); }
+  .toc-legend b[data-aud="Cognitive science"]  { color: #C4A0A0; border-color: color-mix(in srgb, #C4A0A0 40%, transparent); }
+  .toc-legend b[data-aud="Auditing"]           { color: #9FB8B0; border-color: color-mix(in srgb, #9FB8B0 40%, transparent); }
+  .toc-legend b[data-aud="Governance"]         { color: #8A9AB0; border-color: color-mix(in srgb, #8A9AB0 40%, transparent); }
+  .toc-legend b[data-aud="Deployment"]         { color: #C4A87A; border-color: color-mix(in srgb, #C4A87A 40%, transparent); }
+  .toc-legend b[data-aud="Cost"]               { color: #C49A7A; border-color: color-mix(in srgb, #C49A7A 40%, transparent); }
+  .toc-legend b[data-aud="Methodology"]        { color: #8A99A8; border-color: color-mix(in srgb, #8A99A8 40%, transparent); }
+
+  .toc-legend {
+    padding: 12px 20px 14px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    font-family: "Inter", sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .toc-legend .label { color: var(--ink-3); margin-right: 4px; }
+  .toc-legend b {
+    font-weight: 500;
+    padding: 1px 6px;
+    border: 1px solid var(--rule-2);
+    border-radius: 999px;
+  }
+
+  :root[data-theme="light"] body { color-scheme: light; }
+
+</style>
+</head>
+<body>
+
+<main class="page" id="page">
+<!-- BODY -->
+</main>
+
+<!-- Floating TOC button with reading-progress ring -->
+<button class="toc-fab" id="tocFab" aria-label="Open table of contents" title="Contents">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <line x1="4" y1="6" x2="14" y2="6"></line>
+    <line x1="4" y1="12" x2="20" y2="12"></line>
+    <line x1="4" y1="18" x2="11" y2="18"></line>
+  </svg>
+  <svg class="progress-ring" viewBox="0 0 52 52" aria-hidden="true">
+    <circle cx="26" cy="26" r="24" id="progRing"></circle>
+  </svg>
+</button>
+
+<div class="toc-overlay" id="tocOverlay"></div>
+
+<aside class="toc-drawer" id="tocDrawer" aria-hidden="true">
+  <div class="toc-head">
+    <h2>Contents</h2>
+    <div class="toc-actions">
+      <button class="toc-iconbtn" id="themeBtn" aria-label="Toggle light/dark theme" title="Toggle theme">
+        <!-- icon swapped at runtime -->
+        <svg id="themeIconDark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+      </button>
+      <button class="toc-iconbtn" id="closeBtn" aria-label="Close contents">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <ul class="toc-list" id="tocList">
+<!-- TOC -->
+</ul>
+  <div class="toc-legend" id="tocLegend">
+    <span class="label">Audiences</span>
+    <b data-aud="ML">ML</b>
+    <b data-aud="AI safety">AI safety</b>
+    <b data-aud="Core">Core</b>
+    <b data-aud="Trust">Trust</b>
+    <b data-aud="Policy">Policy</b>
+    <b data-aud="Cognitive science">Cog sci</b>
+    <b data-aud="Auditing">Auditing</b>
+    <b data-aud="Governance">Governance</b>
+    <b data-aud="Deployment">Deployment</b>
+    <b data-aud="Cost">Cost</b>
+    <b data-aud="Methodology">Methodology</b>
+  </div>
+</aside>
+
+<script>
+  // === Theme persistence ===
+  const root = document.documentElement;
+  const themeBtn = document.getElementById('themeBtn');
+  const STORAGE_KEY = 'paper-theme';
+  function setTheme(t) {
+    root.setAttribute('data-theme', t);
+    localStorage.setItem(STORAGE_KEY, t);
+    // swap icon — show the TARGET mode (sun in dark mode = "click to go light", moon in light = "click to go dark")
+    const isDark = t === 'dark';
+    themeBtn.innerHTML = isDark
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><line x1="12" y1="2" x2="12" y2="5"></line><line x1="12" y1="19" x2="12" y2="22"></line><line x1="2" y1="12" x2="5" y2="12"></line><line x1="19" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="4.93" x2="6.95" y2="6.95"></line><line x1="17.05" y1="17.05" x2="19.07" y2="19.07"></line><line x1="4.93" y1="19.07" x2="6.95" y2="17.05"></line><line x1="17.05" y1="6.95" x2="19.07" y2="4.93"></line></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+  }
+  const stored = localStorage.getItem(STORAGE_KEY);
+  setTheme(stored || 'dark');
+  themeBtn.addEventListener('click', () => {
+    setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  });
+
+  // === TOC drawer ===
+  const fab = document.getElementById('tocFab');
+  const drawer = document.getElementById('tocDrawer');
+  const overlay = document.getElementById('tocOverlay');
+  const closeBtn = document.getElementById('closeBtn');
+  function openTOC() {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    drawer.setAttribute('aria-hidden', 'false');
+  }
+  function closeTOC() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+  }
+  fab.addEventListener('click', openTOC);
+  overlay.addEventListener('click', closeTOC);
+  closeBtn.addEventListener('click', closeTOC);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && drawer.classList.contains('open')) closeTOC();
+  });
+  // close TOC when a link is clicked (give it a frame so the scroll fires)
+  document.getElementById('tocList').addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (a) setTimeout(closeTOC, 60);
+  });
+
+  // === Reading progress ring ===
+  const ring = document.getElementById('progRing');
+  const ringCirc = 2 * Math.PI * 24;
+  ring.setAttribute('stroke-dasharray', ringCirc);
+  ring.setAttribute('stroke-dashoffset', ringCirc);
+  function updateProgress() {
+    const h = document.documentElement;
+    const scrolled = h.scrollTop;
+    const max = h.scrollHeight - h.clientHeight;
+    const pct = max > 0 ? Math.min(1, scrolled / max) : 0;
+    ring.setAttribute('stroke-dashoffset', ringCirc * (1 - pct));
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+
+  // === Active section tracking via IntersectionObserver ===
+  // Audience pills are now generated by the build script in TOC HTML.
+  // The runtime decoration below is disabled to avoid duplication.
+
+  const tocLinks = Array.from(document.querySelectorAll('#tocList a[href^="#"]'));
+  const idToLink = new Map(tocLinks.map(a => [a.getAttribute('href').slice(1), a]));
+  const targets = tocLinks
+    .map(a => document.getElementById(a.getAttribute('href').slice(1)))
+    .filter(Boolean);
+
+  let visible = new Set();
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) visible.add(e.target.id);
+      else visible.delete(e.target.id);
+    }
+    // pick the topmost visible target
+    const ordered = targets.filter(t => visible.has(t.id));
+    if (ordered.length) {
+      const top = ordered[0];
+      tocLinks.forEach(a => a.classList.remove('active'));
+      const link = idToLink.get(top.id);
+      if (link) {
+        link.classList.add('active');
+        // ensure visible inside the TOC list when drawer is open
+        if (drawer.classList.contains('open')) {
+          link.scrollIntoView({ block: 'nearest' });
+        }
+      }
+    }
+  }, { rootMargin: '-10% 0px -70% 0px', threshold: 0 });
+  targets.forEach(t => io.observe(t));
+</script>
+
+</body>
+</html>

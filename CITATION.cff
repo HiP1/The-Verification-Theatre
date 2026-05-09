@@ -1,0 +1,73 @@
+cff-version: 1.2.0
+title: >-
+  The Verification Theatre: What Verification Is, What It Could Be,
+  What Becomes Possible
+message: >-
+  If you cite this work, please use the metadata from this file.
+type: article
+authors:
+  - family-names: Phan
+    given-names: Ivan
+    orcid: "https://orcid.org/0009-0003-1095-5855"
+    affiliation: Independent Researcher
+abstract: >-
+  AI labs market self-verification as a delivered capability. Independent
+  measurement consistently fails to detect it as distinct from cheaper
+  alternatives. This paper diagnoses the gap and specifies what would close
+  it. Drawing on four established traditions (auditing, science studies,
+  cognitive psychology, expertise studies), it composes three preceding
+  diagnoses into a constructive specification: four preconditions
+  (architectural deliberation, training-signal grounding, infrastructure
+  preservation, integration timing) that together provide the structural
+  equivalent of the developmental conditions human verification requires.
+  Six falsifiable predictions with null hypotheses test whether the specific
+  four-component cut is necessary. Paper 4 of The Training Landscape series.
+keywords:
+  - AI verification
+  - self-correction
+  - chain-of-thought faithfulness
+  - trust calibration
+  - annotation quality
+  - deployment infrastructure
+  - verification theatre
+  - training-layer paradox
+license: CC-BY-4.0
+date-released: "2026-05-07"
+url: "https://hip1.github.io/The-Verification-Theatre/the-verification-theatre.html"
+repository-code: "https://github.com/HiP1/The-Verification-Theatre"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.20091382"
+    description: Zenodo DOI (update after deposit)
+references:
+  - type: article
+    title: >-
+      Uncertainty Collapse in Post-Trained Language Models: Keep Calm or Carry On
+    authors:
+      - family-names: Phan
+        given-names: Ivan
+    url: "https://hip1.github.io/Uncertainty-Collapse/uncertainty-collapse.html"
+    identifiers:
+      - type: doi
+        value: "10.5281/zenodo.19482051"
+  - type: article
+    title: >-
+      The Judgment Paradox: Disagreement Valuation, Annotation Pipelines,
+      Synthetic Data, and the Case for Preservation
+    authors:
+      - family-names: Phan
+        given-names: Ivan
+    url: "https://hip1.github.io/The-Judgment-Paradox/the-judgment-paradox.html"
+    identifiers:
+      - type: doi
+        value: "10.5281/zenodo.19594378"
+  - type: article
+    title: >-
+      The Tunnel Pipeline: What Gets Lost, What It Costs, and the Case for PARIA
+    authors:
+      - family-names: Phan
+        given-names: Ivan
+    url: "https://hip1.github.io/The-Tunnel-Pipeline/the-tunnel-pipeline.html"
+    identifiers:
+      - type: doi
+        value: "10.5281/zenodo.19804186"
