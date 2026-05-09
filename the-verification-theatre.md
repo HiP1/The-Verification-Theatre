@@ -1053,7 +1053,7 @@ Phan, I. (2026b). The Judgment Paradox: Disagreement Valuation, Annotation Pipel
 
 Phan, I. (2026c). The Tunnel Pipeline: What Gets Lost, What It Costs, and the Case for PARIA. The Training Landscape series, Paper 3. DOI: 10.5281/zenodo.19804186.
 
-Phan, I. (2025-2026). Confidence Curriculum series. Papers 1-5 plus Epilogue. https://hip1.github.io/confidence-curriculum/
+Phan, I. (2026). Confidence Curriculum series. Papers 1-5 plus Epilogue. https://hip1.github.io/confidence-curriculum/
 
 Plank, B. (2022). The "Problem" of Human Label Variation: On Ground Truth in Data, Modeling and Evaluation. *EMNLP 2022*, 10671-10682. DOI: 10.18653/v1/2022.emnlp-main.731.
 
