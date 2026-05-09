@@ -44,10 +44,10 @@ Papers 1-3 diagnose specific failure modes. Paper 4 composes those diagnoses int
 
 ## Key contributions
 
-- **Verification taxonomy** (§3): External verification, internal verification, and integration timing resolve apparent contradictions in the self-correction literature.
+- **Verification taxonomy** (§3): External and internal verification distinguished, internal verification rehabilitated under structural conditions, composed into path 3. Resolves apparent contradictions in the self-correction literature.
 - **Four-precondition composition** (§4): Architectural deliberation, training-signal grounding, infrastructure preservation, and integration timing specified as structural conditions for operationally warranted verification.
 - **Training-layer paradox** (§6.2): Multi-source training data collapses into single-voice output through annotation consensus, helpfulness optimisation, and autoregressive inference. Prompted plurality reproduces the problem: surface diversity within frame-level uniformity.
-- **Scale-invariant orchestration** (§5): The same four preconditions govern the orchestrator and the specialists.
+- **Specialist-generalist orchestration** (§5): The same types of preconditions govern the orchestrator and the specialists, though operational instantiation differs at each level.
 - **PARIA consistency check** (§4.5): Path 3 satisfies, at the level of specification, the judgment conditions its source papers identify as necessary.
 - **Six falsifiable predictions** (§8) with null hypotheses designed to cost the framework something specific if they hold.
 
