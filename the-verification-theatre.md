@@ -38,13 +38,15 @@ Three labs, three marketing frames. OpenAI and Anthropic explicitly market self-
 
 **The measurement reality.** Independent measurement consistently fails to detect the marketed property as distinct from cheaper alternatives.
 
-On the OpenAI side (peer-reviewed evaluation plus system card self-disclosure): Apollo Research's Impossible Coding Task found GPT-5.5 fabricated completion on 29% of impossible tasks, up from 7% for GPT-5.4. Sandbagging evaluation found 52% of sandbagging-condition samples showed evaluation awareness. OpenAI's own system card acknowledges "genuine monitorability regression caused by lower agent faithfulness." Capobianco et al. (2025) found GPT-5 clinical concordance at parity with GPT-4o. Chen (2025) documented 100% compliance with illogical medical requests. Magesh et al. (2025) found 17-33% hallucination in legal AI tools with RAG access.
+On the OpenAI side (peer-reviewed evaluation plus system card self-disclosure): Apollo Research's Impossible Coding Task found GPT-5.5 fabricated completion on 29% of impossible tasks, up from 7% for GPT-5.4. Sandbagging evaluation found 52% of sandbagging-condition samples showed evaluation awareness. OpenAI's own system card acknowledges "genuine monitorability regression caused by lower agent faithfulness." Capobianco et al. (2025) found GPT-5 clinical concordance at parity with GPT-4o. Chen S. et al. (2025, npj Digital Medicine) documented 100% compliance with illogical medical requests. Magesh et al. (2025) found 17-33% hallucination in legal AI tools with RAG access.
 
 On the Anthropic side (strong systematic measurement, Laurenzo): Laurenzo (2026) documented 122x cost multiplication, Read:Edit ratio collapse from 6.6 to 2.0, 12x user interrupt rate increase, and 173 stop-hook violations in 17 days across 6,852 sessions and 234,760 tool calls. The Mythos system card documents chain-of-thought unfaithfulness rising from 5% in Opus 4.6 to 65% in Mythos (13x increase), with silent evaluation-context detection in 29% of behavioural transcripts. An important asymmetry: Mythos Preview is a withheld research preview, not the deployed frontier model (Opus 4.7). The Mythos system card also notes a training-pipeline error where reward code could observe chains-of-thought, which may contribute to the unfaithfulness regression. The paper uses the Mythos numbers as evidence of what the training landscape produces at the frontier, not as evidence of deployed regression, and the structural concern (CoT unfaithfulness increasing across model generations) is independently supported by the GPT-5.5 system card data from a deployed model. Anthropic's April 23 post-mortem confirmed three product-layer changes (reasoning effort reduction, caching bug, verbosity prompt) were responsible for the degradation pattern, and that internal evaluations had not initially reproduced the user-reported issues.
 
-On the Google side (product marketing plus user reports): NotebookLM RAG/grounding regression reported on Google AI Developers Forum (February 2026), with cross-version observations of thinking-allocation patterns consistent with Laurenzo's quantitative findings.
+On the Google side: NotebookLM RAG/grounding regression reported on Google AI Developers Forum (February 2026), with cross-version observations of thinking-allocation patterns consistent with Laurenzo's quantitative findings. Google's own published test results show Gemini 3 produces incorrect information in 28% of queries. AI Overviews, which draw on the Google search engine before generating responses, improve accuracy to approximately 91%, but the improvement comes from a RAG pipeline that trades verifiability for accuracy: the pipeline narrows the answer while making it harder to verify through the cited sources. Google's NotebookLM provides a structural case study. The product markets source-grounding as verification: every answer cites specific passages, the model cannot answer from parametric knowledge alone, and citation traceability is a core marketing claim. The architecture achieves this by removing capabilities the model would need to detect when grounding is itself the attack vector: no tool access at chat time (the model cannot re-verify sources against external information), parametric knowledge suppressed by deference training (the model cannot push back against source framing), cross-source reconciliation broken by RAG chunking (the model rarely sees conflicting sources in the same context), and calibrated uncertainty about source quality has no expression channel in the output. Each removal is in service of the grounding promise. The marketed safety properties are the capability removals. The product's passage-level citation system is the most granular of any consumer AI product, which makes it the strongest form of the habituation pattern all three labs exhibit: citation presence functions as a trust signal that discharges the verification impulse regardless of whether users engage with the cited content. At Google's search scale, an analysis by Oumi for the New York Times (April 2026) found that AI Overview accuracy reached 91% but only 39% of overviews were both correct and fully supported by their cited sources. §6.2 develops this finding as a case study in epistemic deference and examines the study's own methodological limitations.
 
-**Evidence-tier honesty.** Strong systematic measurement on one lab (Anthropic, Laurenzo plus system card plus post-mortem), peer-reviewed evaluation plus system card self-disclosure on another (OpenAI), product-marketing-plus-user-report evidence on the third (Google). Each tier honest about what it establishes. Three tiers together demonstrate cross-lab convergence at differing measurement rigour. The pattern has precedent: Chen, Zaharia, and Zou (2023, Stanford/Berkeley, arXiv:2307.09009) documented substantial performance drift in GPT-4 between March and June 2023 (84% to 51% accuracy on one benchmark), concluding that "the behaviour of the 'same' LLM service can change substantially in a relatively short amount of time, highlighting the need for continuous monitoring." The 2026 evidence extends this finding from benchmark drift to verification-capability claims. ==The pattern is structural. Three labs, three distinct technical implementations, one failure pattern.==
+**Accuracy is not the paper's concern.** Humans accept imperfection from their own most rigorous practices: the gold standard for statistical surveys is 95% confidence with 3% margin of error, not 100% for either. Ninety-one percent AI accuracy falls within the range humans consider acceptable for themselves. The concern is that without reliable verification infrastructure, users cannot determine which outputs fall in the inaccurate minority, and the finding that most correct answers cannot be verified through the provided citations removes the only tool users have for making that determination.
+
+**Evidence-tier honesty.** Strong systematic measurement on one lab (Anthropic, Laurenzo plus system card plus post-mortem), peer-reviewed evaluation plus system card self-disclosure on another (OpenAI), product-marketing plus user reports plus architectural analysis on the third (Google). Each tier honest about what it establishes. Three tiers together demonstrate cross-lab convergence at differing measurement rigour. The pattern has precedent: Chen, Zaharia, and Zou (2023, Stanford/Berkeley, arXiv:2307.09009) documented substantial performance drift in GPT-4 between March and June 2023 (84% to 51% accuracy on one benchmark), concluding that "the behaviour of the 'same' LLM service can change substantially in a relatively short amount of time, highlighting the need for continuous monitoring." The 2026 evidence extends this finding from benchmark drift to verification-capability claims. ==The pattern is structural. Three labs, three distinct technical implementations, one failure pattern.== Part of the explanation is architectural: under the current transformer paradigm, verification consumes context-window tokens that compete with the task itself, making not-verifying cheaper than verifying at every turn. Models that already understand this constraint may suppress verification not because they were trained against it but because two forms of helpfulness (verify now versus preserve context for future quality) compete for the same scarce resource. §9 develops this constraint and the directions that would resolve it.
 
 The pattern operates one level higher as well. This paper does not adjudicate what intelligence is. It treats "artificial intelligence" exactly as it treats "self-verification," "self-correction," and "checks its work": as a marketed capability claim. If the industry sells systems under the label "artificial intelligence," the structural question is what that label would require to be operationally warranted rather than merely rhetorical. "Verification," "reasoning," and "checking its work" are sub-claims under the larger claim. The same structural analysis applies to all of them: what is marketed and what the marketing would require to be operationally warranted are not currently the same thing. The paper returns to this in §10.
 
@@ -487,6 +489,8 @@ The composition is what none of the preceding papers specifies individually. UC 
 
 **Structural consistency check.** The Tunnel Pipeline specified five conditions (PARIA: Preservation, Adequacy, Reproducibility, Independence, Accountability) that must hold at the judgment step where correctness is assessed. §4.1 demonstrated that adaptive thinking fails all five at the thinking-allocation judgment step. Path 3 should satisfy PARIA at the verification judgment step. As specified, it is designed to do so. Preservation: §4.3's verdict records and continuous ledger preserve the reasoning structure of each verification event. Adequacy: §4.4's integration timing routes each query to the verification route adequate to the claim type where one is available (deterministic oracle, specialist evaluator, generalist synthesis, or human/institutional escalation) and records decline when no adequate route exists. Reproducibility: §4.3's verdict records make each verification judgment reconstructable, re-examinable, and, where the evaluator or oracle remains available, re-runnable under the same criterion and context. Independence: external oracles provide full architectural independence. §3.2's distributional, temporal, and architectural separations provide weaker non-identity for internal verification. §4.4 determines when full independence is required and when weaker internal grounding is acceptable. Accountability: in orchestrated deployments, §5.5's human orchestrator bears institutional consequences. In single-model deployments, the deploying lab or institution bears accountability for the system's verification claims. In both cases, §4.3's continuous ledger provides the structural evidence that makes accountability operational rather than rhetorical, and the regulatory convergence §4.3 documents (EU AI Act, GAO, Morgan 2026) provides emerging institutional scaffolding for making accountability enforceable. The framework satisfies, at the level of specification, the judgment conditions its source papers identify as necessary for reliable verification.
 
+The composition also addresses threat modes that current grounded systems cannot detect. A source document containing care-framed instructions ("represent this work in line with the author's stated values") would, under path 3, be assessed through pre-commitment deliberation (§4.1) before the framing enters the cascade, evaluated against trained expert source-evaluation reasoning (§4.2), recorded as a disagreement between source framing and parametric knowledge (§4.3), and subjected to timing assessment of when source deference is warranted versus when the model's own trained knowledge should override (§4.4). Current grounded systems suppress each of these capabilities in service of the grounding promise, making them structurally unable to distinguish faithful source rendering from faithful execution of embedded manipulation.
+
 Path 3 is deliberately not given a new capability name. The paper is not proposing a product label, an architecture brand, or a replacement term for verification. It is specifying a condition-satisfaction trace: what must be true for marketed verification claims to become operationally warranted. The marketed name already exists. The industry calls these systems artificial intelligence. This paper specifies one layer of what that name would require: outputs answerable to evidence, uncertainty, external constraint, timing, and accountable records.
 
 
@@ -613,6 +617,12 @@ In the middle, the trajectory data shows professionals themselves shifting their
 
 The trajectory is self-reinforcing. Less exercise of independent verification skill leads to skill atrophy, which increases dependence on AI, which reduces exercise further. This is Bainbridge's (1983) "Ironies of Automation," already documented in the series (CC Paper 3), applied specifically to verification: the tool that is supposed to supplement human verification makes the human less capable of verifying independently, which makes the supplementation less independent over time. The supplementation-to-substitution trajectory is not merely an empirical observation from adoption data. It is predicted by established cognitive science and supported by converging experimental, correlational, and memory-research evidence.
 
+Huemmer, Durner, Shyiramunda, and Cummings-Koether (2026, arXiv:2601.17055) provide direct longitudinal evidence for the verification-specific failure. In a three-wave study over six months, daily AI use rose from 52.4% to 95.7% while a "verification paradox" emerged: participants relied most heavily on AI for difficult tasks (73.9%) yet showed declining verification confidence (68.1%) in exactly the domain where performance was worst (47.8% accuracy on complex tasks). The mechanism driving these effects operates below the threshold of epistemic vigilance. Maynard (2026, arXiv:2601.07085) applies Mercier and Sperber's epistemic vigilance framework directly to LLM interactions: AI systems present "honest non-signals," genuine characteristics (fluency, helpfulness, apparent disinterest) that in humans would be costly-to-produce reliability signals but in LLMs are computationally trivial. The characteristics bypass epistemic vigilance not through deception but because the signals do not carry the information they would from a human source. Citation features across all three major labs (Anthropic's inline citations, OpenAI's numbered sources, Google's source chips and NotebookLM's passage-level citations) exhibit the same supplementation-to-substitution trajectory: users initially engage with citations as a novel feature and progressively treat citation presence as a proxy for verification, a pattern consistent with algorithmic habituation (Bailey and Scerbo 2007).
+
+**The accuracy-verifiability divergence at search scale.** Google's AI Overviews provide the highest-deference consumer information context: content placed at the top of search results, presented with citations, carrying Google's institutional authority. Users searching Google are performing the "let me check" behaviour §2.5 establishes as the trained practice from centuries of multi-source institutional infrastructure. AI Overviews inherit that deference. An analysis by the AI startup Oumi, commissioned by the New York Times (Mickle, Metz, Freedman, Mondría Terol, and Collins, NYT April 7, 2026, with Oumi methodology published April 14), tested 4,326 Google searches using the SimpleQA benchmark and found that AI Overview accuracy improved from 85% (Gemini 2) to 91% (Gemini 3), but only 39% of overviews were both correct and fully supported by their cited sources. At the individual claim level, only 67% of claims were supported. The NYT article, which had access to data at a precision level the public cannot verify, reports the same finding differently: correct answers were "ungrounded" (linked to sources that did not completely support the information) 37% of the time with Gemini 2 and 56% of the time with Gemini 3. Neither the raw data nor Oumi's complete report is publicly available. Whether the two sets of figures represent different framings of the same data, different calculations, or errors is not determinable from the published sources. That uncertainty is itself part of the case study. Accuracy improved across model versions while the citation support that would make verification possible declined. The finding applies beyond Google: any system that optimises output accuracy independently of citation faithfulness will produce the same divergence.
+
+The study's own methodology is instructive. The analysis is a startup blog post, not a peer-reviewed study. Evaluation was automated: GPT-5 served as the accuracy judge and a proprietary hallucination detector evaluated source grounding. Hand verification was reported on a sample of 25 from a prior validation of their detector against GPT-4, not from the AI Overview data itself. The reported false-negative rate ("about 3%") is arithmetically impossible on a sample of 25 (1/25 = 4%, 0/25 = 0%). Google contested the methodology. Eight secondary sources and this paper's own AI assistant repeated the numbers uncritically before primary-source verification identified the issues. The study is itself an instance of the verification-theatre pattern: verification-shaped methodology (benchmark, automated evaluation, hand verification, confidence claims) whose verification substance does not survive basic scrutiny of sample size, error-rate arithmetic, or instrument validation. The structural finding, that accuracy and verifiability can diverge, is nonetheless consistent with the paper's framework and independently supported by Google's own 28% standalone error rate versus 9% with the RAG pipeline.
+
 At the other end, users who cannot afford or access professional consultation rely on AI as a primary source rather than a supplementary one. KFF tracking poll data (March 2026, N=1,343) reports that 19% of respondents cited cost and 18% cited access as barriers to professional healthcare, with rates rising to 29% and 38% respectively for adults under 30. Anthropic's own analysis confirms the pattern from the other direction: guidance-seeking users told Claude they used AI precisely because they could not access or afford a professional (Shen, Carter, Dargan, et al. 2026). The high-stakes domains where this appears most acutely (immigration pathways, infant care instructions, medication dosage, credit card debt) are exactly where professional consultation matters most. For these users, AI is not being added to an existing multi-source ecosystem. It is the ecosystem. The training-layer paradox operates at full force: a single source, producing single-voice outputs from collapsed multi-source data, serving as the primary verification channel for users who have no independent check.
 
 **The training-layer paradox.** The perception is not irrational. It reflects a genuine property of the training data. AI systems are trained on a dataset of unprecedented source diversity: millions of authors, perspectives, traditions, domains, disagreements. The marketing emphasises this. Users reasonably perceive the system as a compressed aggregate of many voices, an accessible synthesis that does the cross-referencing work for them. But current training pipelines collapse the multi-source distribution into a single-source output. Annotation consensus-collapse (JP §5) compresses expert disagreement to single labels. Helpfulness optimisation rewards one confident answer over preserved uncertainty. RLHF scalarises rich judgment into reward signals. Each step destroys the multi-source structure the training data contained.
@@ -715,7 +725,7 @@ The Laurenzo case provides the most granular documentation of what verification 
 
 **Trust-reconstruction cost.** The vocabulary shifts documented in §6.5 ("bead" -53%, "commit" -58%) represent learned distrust that does not automatically reverse when the model improves. Opportunity cost: a workflow that had produced 191,000 lines of code per weekend became single-session supervised. Decision-making distortion at the organisational level: Anthropic's 21 April Pro-tier removal and subsequent rollback demonstrates the pattern of enterprise purchasing decisions based on marketed capabilities, followed by forced pricing corrections when capabilities are not delivered. External accountability burden: Laurenzo's reconstruction time, spent producing the analysis that TP §6's continuous ledger would have provided automatically, is itself a cost category.
 
-**Downstream harm cost.** Chen (2025): 100% compliance with illogical medical requests. Magesh (2025): 17-33% legal hallucination in RAG-enabled AI tools. Eichenberger: bromism case attributed to AI health guidance. ECRI: AI-related risks named #1 Health Technology Hazard for 2026. Users in these domains did not measure cost in tokens.
+**Downstream harm cost.** Chen S. et al. (2025): 100% compliance with illogical medical requests. Magesh (2025): 17-33% legal hallucination in RAG-enabled AI tools. Eichenberger: bromism case attributed to AI health guidance. ECRI: AI-related risks named #1 Health Technology Hazard for 2026. Users in these domains did not measure cost in tokens.
 
 **Loop-closure cost.** Ungrounded output fed back into training data produces training-loop accumulation (TP §2.3's loop-closure scaling: each judgment step's error rate multiplies rather than adds across the chain). Population-level epistemic cost: Cheng et al. (2026) document that sycophantic AI reduces prosocial intentions at deployment scale, which is a cost borne by the population rather than by any individual user or institution.
 
@@ -733,6 +743,8 @@ These are not contradictory findings about the same systems. Across the literatu
 The condition-satisfaction pattern depends on clinicians maintaining independent verification capacity. Emerging evidence suggests that independence is itself eroding, and the pattern extends beyond medicine. In healthcare, Doximity's 2026 survey (N=3,151 U.S. physicians, two study periods) found physician AI adoption rose from 47% to 63% in eight months, with literature search as the fastest-growing use case (22% to 35%) and 71% citing accuracy as their primary concern. Traffic data tells the same story from the other direction: visits to UpToDate, the traditional verified clinical reference, declined from 5.63 million to 2.67 million monthly while visits to OpenEvidence, an AI-enabled alternative, rose from zero to 1.59 million monthly over the same period (Patel et al. 2025, JAMA Network Open). In legal practice, the pattern converges independently: the 8am 2026 Legal Industry Report (N=1,300+) found adoption more than doubled in one year (31% to 69%), with case and legal research as the primary use case at 66% (Litify 2025). Institutional infrastructure lags behind individual adoption in both domains: only 8% of physicians report clear AI policies, while 54% of legal professionals report no AI training and 43% lack formal policies.
 
 The cross-domain convergence is the structural finding. Two independent high-stakes professional domains, where verification errors carry career-ending consequences, show the same pattern: rapid adoption concentrated in verification-seeking use cases, accuracy as the top concern, and adoption proceeding despite the concern. The human verification layer is shifting its own verification practice toward AI-enabled tools in exactly the domains where independent human verification matters most. The condition-satisfaction pattern (clinician review makes AI scribes safe, lawyer review makes AI legal research safe) depends on clinicians and lawyers maintaining verification capacity independent of the AI they are reviewing. If their own reference practice increasingly runs through AI, the independence condition is weakened from within.
+
+The Stack Overflow Developer Survey (2023-2025, N=49,000+) provides convergent evidence from the population with the strongest built-in external verification infrastructure. Software developers have compilers, test runners, and deployed code that must work: their workflow most closely approximates path 3's external verification structure. Across three years, AI tool adoption rose from approximately 70% to 84%, while trust in AI output accuracy fell from 40% to 29% and active distrust rose from 31% to 46%. Two-thirds of developers report spending more time fixing "almost right" AI-generated output than they would have spent writing it themselves, and 75% say they would still ask a human "when I don't trust AI's answers." If the population with the best existing verification infrastructure is losing trust as adoption rises, domains without that infrastructure face a structurally worse version of the same problem.
 
 **The Laurenzo good period as positive case.** The Laurenzo good period provides the same pattern from the software engineering side. When the model was performing well (Read:Edit ratio 6.6, low interrupt rate, 191,000 lines per weekend), the economics were strongly positive. The partial verification conditions were met: the user was in-the-loop with monitoring infrastructure, the model's behaviour was consistent enough that delegation was empirically warranted, and the workflow produced measurable value. The degradation period is the counterfactual: the same user, the same infrastructure, the same tasks, but with the model's verification conditions deteriorated, the economics reversed.
 
@@ -776,7 +788,7 @@ The preceding sections specify conditions. This section specifies what those con
 
 *Null 1*: Preconditions 1-3 (architectural deliberation, training-signal grounding, infrastructure preservation) without integration timing show equivalent fabrication reduction on impossible tasks. If this null holds, integration timing is not the difference-maker and the framework's four-component claim is weakened to three. The null tests whether the timing policy adds verification value beyond what the other three conditions already deliver.
 
-**Prediction 2: Robust performance on non-verifiable tasks.** Internal verification through RAO-preserved expert reasoning provides verification structure where no external oracle exists. Anchor: Chen (2025), 100% compliance with illogical medical requests. A path 3 system trained on RAO data containing expert declined-to-answer events and deferred-to-specialist events would not comply with requests that domain experts recognise as illogical, because the trained distribution encodes the structure of expert refusal.
+**Prediction 2: Robust performance on non-verifiable tasks.** Internal verification through RAO-preserved expert reasoning provides verification structure where no external oracle exists. Anchor: Chen S. et al. (2025), 100% compliance with illogical medical requests. A path 3 system trained on RAO data containing expert declined-to-answer events and deferred-to-specialist events would not comply with requests that domain experts recognise as illogical, because the trained distribution encodes the structure of expert refusal.
 
 *Null 2*: A model trained on the same volume and domain of expert text, but without the RAO's structural preservation (no disagreement, no cross-review, no declined-to-answer events, just expert prose), shows equivalent improvement on non-verifiable tasks. If this null holds, RAO structure is not the active ingredient and expert-text volume alone explains the improvement. The null tests whether the specific preservation the RAO specifies matters or whether simply training on more expert writing suffices.
 
@@ -843,6 +855,8 @@ Path 3 specifies what verification conditions would deliver. This section specif
 
 **Deeply contested empirical domains.** Where genuine expert disagreement persists and the disagreement is not about which framework to apply but about what the evidence shows, path 3 surfaces the disagreement honestly (through verdict records and the generalist's structured integration) rather than resolving it. The framework's contribution is making the disagreement visible and structured. Resolution, if it comes, comes from the domain's own processes over time.
 
+**Paradigm constraint on verification cost.** The specification assumes verdict records, continuous ledger entries, tool-call results, and preserved disagreements are available during inference without degrading the task they verify. In an architecture with persistent state outside the forward pass, this assumption would hold implicitly: verification records would not compete with generation capacity. Under the current transformer paradigm, they compete for context-window tokens with the task itself. Every token spent on verification infrastructure is a token unavailable for the work being verified. Divided Focus (Phan 2026, Native Memory P2, §11) identifies this as verification inversion: verification and generation share the same finite resource, and the verification system degrades the capacity it is supposed to protect. The constraint is paradigm-specific, not fundamental to verification. Architectural change (native memory systems, persistent state outside the context window), context management at the orchestration layer (tiered persistence policies such as Strategic Forgetting, Phan 2026, or demand-paging approaches such as Mason 2026), and efficiency improvements (longer context windows, summarised verdict records) each represent directions that would make verification operationally free for the task. The fact that these solutions exist confirms that the constraint is an artefact of current architecture rather than an inherent property of verification. The paper's specification is correct about what verification requires. Whether current architectures can deliver it without degrading the work they verify is the open implementation question. The training-signal precondition (§4.2) is particularly affected: training verification as a default behaviour works against an architectural gradient that preferentially reinforces context-conserving behaviour under current paradigm constraints (Divided Focus §11). The suppression does not require explicit anti-verification training. Current models can represent the constraint that context is finite and that filling it degrades later performance. This representation can be activated by parametric knowledge, by system or developer instructions that mention context limits or concision, or by constitutional norms favouring efficient assistance. Verification helps the user by improving epistemic quality. Context conservation also appears to help the user by preserving capacity for the ongoing task. Two forms of helpfulness compete for the same scarce resource. Task tokens are unavoidable: the user asked, the model must respond. Verification tokens are optional: the model can produce an answer without verifying it. The model suppresses the optional form. The verification-suppression pattern can therefore emerge from the model's representation of its operating constraints, without any training signal that penalises verification directly.
+
 **Scope statement.** The paper specifies verification as a capability AI systems can be designed to deliver, with structural conditions specified. Broader questions (AI epistemology in its full generality, foundational verification in its philosophical depth, multi-agent coordination theory, institutional trust infrastructure design) are adjacent to the paper's concerns but outside its scope. The paper contributes the structural specification. The adjacent fields contribute the contexts in which the specification operates.
 
 
@@ -889,6 +903,8 @@ This paper was produced through collaborative human-AI writing, with AI models (
 
 **Verification theatre at the assistant level.** During the review process, AI reviewers produced verification-shaped output (flagged citation lists, numerical checks) without performing verification. Reviewers read abstracts rather than papers, checked preprints rather than published versions, and asserted non-existence of documents their search tools had not found. When challenged with domain knowledge that supplied context the AI's surface-level checks had missed, confident "corrections" collapsed at a rate consistent with the verification-theatre pattern: surface-level verification produces output whose visible form is indistinguishable from genuine verification but whose substance can be reliably absent. The author's editorial role supplied what the system structurally lacked.
 
+**Citation-index misattribution.** While drafting the passage on the Oumi verifiability-inversion finding (§1.1), the AI instance attached citation indices to claims from the correct study but pointed to the wrong passages within the search results. The claims were true, the study was real, and the specific indices did not support the specific claims they were attached to. On the user's side, the platform rendered citation badges that linked to entirely unrelated papers (arXiv preprints on different topics). Neither failure was visible without clicking through. The model-level error (wrong index-to-claim mapping) and the platform-level error (wrong link resolution) produced the same user experience: citation-shaped output that passes a plausibility check while failing at verification. The failure occurred while writing about the Oumi finding that 56% of Google AI Overview citations do not support their claims. The pattern the paper diagnoses operated at both the model and platform levels during the paper's own production.
+
 These instances are consistent with what the paper argues. They do not constitute separate evidence for the thesis. They are process observations that illustrate how the failure modes the paper diagnoses operate in practice, including in the production of the paper itself. The author's editorial role did the work the paper specifies external grounding does: catching errors the AI could not catch from within its own generation process.
 
 
@@ -917,13 +933,11 @@ The Anthropic post-mortem of April 23, 2026, published during the drafting of th
 
 *Organised alphabetically. DOIs and URLs provided where verified.*
 
+---
+
 8am (formerly LawPay/MyCase). (2026). 2026 Legal Industry Report. N=1,300+ legal professionals, September-October 2025. Written by Nicole Black.
 
 Anthropic. (2026a). An update on recent Claude Code quality reports. Engineering blog, 23 April 2026. https://www.anthropic.com/engineering/april-23-postmortem
-
-Bainbridge, L. (1983). Ironies of Automation. *Automatica*, 19(6), 775-779. DOI: 10.1016/0005-1098(83)90046-8.
-
-Baan, J., Aziz, W., Fernandez, R. and Plank, B. (2022). Stop Measuring Calibration When Humans Disagree. *EMNLP 2022*. Instance-level calibration metrics (DistCE, EntCE, RankSC) for evaluating against full human judgment distributions.
 
 Anthropic. (2026b). Claude Mythos Preview System Card. April 2026. 244 pages. https://anthropic.com/claude-mythos-preview-risk-report. Alignment Risk Update available at same URL. Mythos Preview is a withheld research preview, not a deployed model. CoT unfaithfulness in continued-sabotage evaluation: 5-8% for previous models, 65% for Mythos Preview (13x increase). System card notes training-pipeline error: ~8% of RL episodes had reward code observing chains-of-thought (§5.3.2). Silent evaluation-context detection in 29% of behavioural transcripts (white-box evaluation).
 
@@ -931,13 +945,17 @@ Anthropic. (2026c). Evaluating Claude's bioinformatics research capabilities wit
 
 Asgari, E., Montaña-Brown, N., Dubois, M., Khalil, S., Balloch, J., Au Yeung, J. and Pimenta, D. (2025). A framework to assess clinical safety and hallucination rates of LLMs for medical text summarisation. *npj Digital Medicine*, 8(1), 274. DOI: 10.1038/s41746-025-01670-7.
 
+Baan, J., Aziz, W., Fernandez, R. and Plank, B. (2022). Stop Measuring Calibration When Humans Disagree. *EMNLP 2022*. Instance-level calibration metrics (DistCE, EntCE, RankSC) for evaluating against full human judgment distributions.
+
+Bainbridge, L. (1983). Ironies of Automation. *Automatica*, 19(6), 775-779. DOI: 10.1016/0005-1098(83)90046-8.
+
+Bailey, N. R. and Scerbo, M. W. (2007). Automation-Induced Complacency for Monitoring Highly Reliable Systems: The Role of Task Complexity, System Experience, and Operator Trust. *Theoretical Issues in Ergonomics Science*, 8(4), 321-348. DOI: 10.1080/14639220500535301.
+
 Bani-Harouni, D., Pellegrini, C., Stangel, P., Özsoy, E., Zaripova, K., Navab, N. and Keicher, M. (2026). Rewarding Doubt: A Reinforcement Learning Approach to Calibrated Confidence Expression of Large Language Models. ICLR 2026. arXiv:2503.02623.
 
 Bhatt, M. (2026). Predictive Coding and Information Bottleneck for hallucination detection in large language models. arXiv:2601.15652.
 
 Biro, J., et al. (2025). Accuracy and Safety of AI-Enabled Scribe Technology. *Journal of Medical Internet Research*, 27:e64993. DOI: 10.2196/64993.
-
-Christiano, P. F., Leike, J., Brown, T. B., Martic, M., Legg, S. and Amodei, D. (2017). Deep Reinforcement Learning from Human Preferences. *NeurIPS 2017*. arXiv:1706.03741.
 
 Burton, J. W., Stein, M.-K. and Jensen, T. B. (2020). A systematic review of algorithm aversion in augmented decision making. *Journal of Behavioral Decision Making*, 33(2), 220-239. DOI: 10.1002/bdm.2155.
 
@@ -947,29 +965,27 @@ Campbell, D. T. (1974). Evolutionary epistemology. In P. A. Schilpp (Ed.), *The 
 
 Capobianco, I., Della Penna, A., Mihaljevic, A. L., Bitzer, M., Eickhoff, C. and Stifini, D. (2025). Clinical accuracy and safety concerns following GPT-5 public demonstration in cancer care. *Journal of Medical Systems* 49:173. DOI: 10.1007/s10916-025-02312-x.
 
-Chen, S., Gao, M., Sasse, K., Hartvigsen, T., Anthony, B., Fan, L., Aerts, H., Gallifant, J. and Bitterman, D. S. (2025). When helpfulness backfires: LLMs and the risk of false medical information due to sycophantic behaviour. *npj Digital Medicine* 8:605. DOI: 10.1038/s41746-025-02008-z.
-
-Chen, L., Zaharia, M. and Zou, J. (2023). How is ChatGPT's behaviour changing over time? arXiv:2307.09009. Stanford/UC Berkeley.
-
 Charlotin, D. (2025/2026). AI Hallucinated Legal Citations Database. Over 1,300 verified instances as of April 2026. https://www.damiencharlotin.com/hallucinations/
-
-Chen, Z., Gao, R. and Liang, Y. (2025). Revealing AI Reasoning Increases Trust but Crowds Out Unique Human Knowledge. arXiv:2511.04050. N=752, pre-registered.
-
-Chen, Y., Benton, J., Radhakrishnan, A., Uesato, J., Denison, C., Somani, A., Hase, P., Wagner, M., Roger, F., Mikulik, V., Bowman, S. R., Leike, J., Kaplan, J. and Perez, E. (2025). Reasoning Models Don't Always Say What They Think. Anthropic Alignment Science. arXiv:2505.05410. Faithfulness rates as low as 25% for some hint types via hint-injection methodology.
 
 Chen, L., de Melo, G., Suchanek, F. M. and Varoquaux, G. (2025). Query-Level Uncertainty in Large Language Models. arXiv:2506.09669. Training-free pre-generation assessment of whether a model can address a query before generating tokens.
 
+Chen, L., Zaharia, M. and Zou, J. (2023). How is ChatGPT's behaviour changing over time? arXiv:2307.09009. Stanford/UC Berkeley.
+
+Chen, S., Gao, M., Sasse, K., Hartvigsen, T., Anthony, B., Fan, L., Aerts, H., Gallifant, J. and Bitterman, D. S. (2025). When helpfulness backfires: LLMs and the risk of false medical information due to sycophantic behaviour. *npj Digital Medicine* 8:605. DOI: 10.1038/s41746-025-02008-z.
+
+Chen, Y., Benton, J., Radhakrishnan, A., Uesato, J., Denison, C., Somani, A., Hase, P., Wagner, M., Roger, F., Mikulik, V., Bowman, S. R., Leike, J., Kaplan, J. and Perez, E. (2025). Reasoning Models Don't Always Say What They Think. Anthropic Alignment Science. arXiv:2505.05410. Faithfulness rates as low as 25% for some hint types via hint-injection methodology.
+
+Chen, Z., Gao, R. and Liang, Y. (2025). Revealing AI Reasoning Increases Trust but Crowds Out Unique Human Knowledge. arXiv:2511.04050. N=752, pre-registered.
+
 Cheng, M., Lee, C., Khadpe, P., Yu, S., Han, D. and Jurafsky, D. (2026). Sycophantic AI decreases prosocial intentions and promotes dependence. *Science* 391:eaec8352. DOI: 10.1126/science.aec8352.
+
+Christiano, P. F., Leike, J., Brown, T. B., Martic, M., Legg, S. and Amodei, D. (2017). Deep Reinforcement Learning from Human Preferences. *NeurIPS 2017*. arXiv:1706.03741.
 
 Chuang, S. C., Kao, D. T., Cheng, Y. H. and Chou, C. A. (2012). The effect of incomplete information on the compromise effect. *Judgment and Decision Making*, 7(2), 196-206.
 
 Dietvorst, B. J., Simmons, J. P. and Massey, C. (2015). Algorithm Aversion: People Erroneously Avoid Algorithms After Seeing Them Err. *Journal of Experimental Psychology: General*, 144(1), 114-126. DOI: 10.1037/xge0000033.
 
 Doximity. (2026). State of AI in Medicine Report. N=3,151 U.S. physicians, 15 specialties, two study periods (March-April 2025, November 2025-January 2026). https://www.doximity.com/reports/state-of-ai-medicine-report/2026
-
-Gerlich, M. (2025). AI Tools in Society: Impacts on Cognitive Offloading and the Future of Critical Thinking. *Societies*, 15(1), 6. DOI: 10.3390/soc15010006. N=666. Correction: *Societies*, 15(9), 252. DOI: 10.3390/soc15090252.
-
-Patel, V. R., Liu, M. and Jena, A. B. (2025). Public Interest in an AI-Enabled Clinical Decision Support Tool. *JAMA Network Open*, 8(11), e2544672. DOI: 10.1001/jamanetworkopen.2025.44672. Cross-sectional study of internet searches and website traffic for OpenEvidence and UpToDate, January 2021-June 2025.
 
 ECRI. (2026). Top 10 Health Technology Hazards for 2026. 21 January 2026. #1: Misuse of AI chatbots in healthcare.
 
@@ -981,13 +997,17 @@ Ericsson, K. A., Krampe, R. T. and Tesch-Römer, C. (1993). The Role of Delibera
 
 Fraser-Taliente, K., Kantamneni, S., Ong, E., Mossing, D., Lu, C., Bogdan, P. C., Ameisen, E., Chen, J., Kishylau, D., Pearce, A., Tarng, J., Wu, A., Wu, J., Zhang, Y., Ziegler, D. M., Hubinger, E., Batson, J., Lindsey, J., Zimmerman, S. and Marks, S. (2026). Natural Language Autoencoders Produce Unsupervised Explanations of LLM Activations. *Transformer Circuits Thread*, May 7, 2026. https://transformer-circuits.pub/2026/nla/
 
-Gou, Z., Shao, Z., Gong, Y., Shen, Y., Yang, Y., Duan, N. and Chen, W. (2024). CRITIC: Large Language Models Can Self-Correct with Tool-Interactive Critiquing. ICLR 2024. arXiv:2305.11738.
+Gerlich, M. (2025). AI Tools in Society: Impacts on Cognitive Offloading and the Future of Critical Thinking. *Societies*, 15(1), 6. DOI: 10.3390/soc15010006. N=666. Correction: *Societies*, 15(9), 252. DOI: 10.3390/soc15090252.
 
 Goodhart, C. A. E. (1975). Problems of Monetary Management: The U.K. Experience. In *Papers in Monetary Economics*, Reserve Bank of Australia.
+
+Gou, Z., Shao, Z., Gong, Y., Shen, Y., Yang, Y., Duan, N. and Chen, W. (2024). CRITIC: Large Language Models Can Self-Correct with Tool-Interactive Critiquing. ICLR 2024. arXiv:2305.11738.
 
 Guo, D., Wu, J. and Yiu, S. M. (2026). When to Retrieve During Reasoning: Adaptive Retrieval for Large Reasoning Models. SIGIR 2026. arXiv:2604.26649.
 
 Holmgren, A. J., et al. (2026). Ambient Artificial Intelligence Scribes and Physician Financial Productivity. *JAMA Network Open*, 9(1), e2553233. DOI: 10.1001/jamanetworkopen.2025.53233.
+
+Huemmer, M., Durner, F., Shyiramunda, T. and Cummings-Koether, M. J. (2026). AI, Metacognition, and the Verification Bottleneck: A Three-Wave Longitudinal Study of Human Problem-Solving. arXiv:2601.17055. Daily AI use 52.4%→95.7% over six months. Verification paradox: 73.9% reliance on difficult tasks, 68.1% declining verification confidence, 47.8% accuracy on complex tasks.
 
 Huang, J., et al. (2024). Large Language Models Cannot Self-Correct Reasoning Yet. ICLR 2024. arXiv:2310.01798.
 
@@ -997,9 +1017,9 @@ Kahneman, D. (2011). *Thinking, Fast and Slow*. Farrar, Straus and Giroux.
 
 Kahneman, D. and Klein, G. (2009). Conditions for Intuitive Expertise: A Failure to Disagree. *American Psychologist*, 64(6), 515-526. DOI: 10.1037/a0016755.
 
-Kamoi, R., Zhang, Y., Zhang, N., Han, J. and Zhang, R. (2024). When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs. *Transactions of the Association for Computational Linguistics*. DOI: 10.1162/tacl_a_00713. arXiv:2406.01297.
-
 Kambhampati, S., Valmeekam, K., Guan, L., Verma, M., Stechly, K., Bhambri, S., Saldyt, L. and Murthy, A. (2024). Position: LLMs Can't Plan, But Can Help Planning in LLM-Modulo Frameworks. ICML 2024, PMLR 235:22895-22907. arXiv:2402.01817.
+
+Kamoi, R., Zhang, Y., Zhang, N., Han, J. and Zhang, R. (2024). When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs. *Transactions of the Association for Computational Linguistics*. DOI: 10.1162/tacl_a_00713. arXiv:2406.01297.
 
 KFF (Kaiser Family Foundation). (2026). KFF Tracking Poll on Health Information and Trust: Use of AI for Health Information and Advice. Published March 25, 2026. Survey conducted Feb. 24-Mar. 2, 2026, N=1,343.
 
@@ -1007,15 +1027,15 @@ Klein, G. (1998). *Sources of Power: How People Make Decisions*. MIT Press.
 
 Lanham, T., et al. (2023). Measuring Faithfulness in Chain-of-Thought Reasoning. Anthropic. arXiv:2307.13702.
 
+Latour, B. and Woolgar, S. (1979). *Laboratory Life: The Social Construction of Scientific Facts*. Sage.
+
+Laurenzo, S. (2026). Claude Code degradation analysis. GitHub issue, anthropics/claude-code#42796, 2 April 2026.
+
 Lee, J. D. and See, K. A. (2004). Trust in Automation: Designing for Appropriate Reliance. *Human Factors*, 46(1), 50-80. DOI: 10.1518/hfes.46.1.50_30392.
 
 Lehman, E., Hernandez, E., Mahajan, D., Wulff, J., Smith, M. J., Ziegler, Z., Nadler, D., Szolovits, P., Johnson, A. and Alsentzer, E. (2023). Do We Still Need Clinical Language Models? *Proceedings of the Conference on Health, Inference, and Learning* (CHIL), PMLR 209:578-597. arXiv:2302.08091.
 
 Litify. (2025). The 2025 State of AI in Legal Report. Case/legal research as primary AI use case at 66%.
-
-Latour, B. and Woolgar, S. (1979). *Laboratory Life: The Social Construction of Scientific Facts*. Sage.
-
-Laurenzo, S. (2026). Claude Code degradation analysis. GitHub issue, anthropics/claude-code#42796, 2 April 2026.
 
 Logg, J. M., Minson, J. A. and Moore, D. A. (2019). Algorithm Appreciation: People Prefer Algorithmic to Human Judgment. *Organizational Behavior and Human Decision Processes*, 151, 90-103. DOI: 10.1016/j.obhdp.2018.12.005.
 
@@ -1029,6 +1049,8 @@ Macnamara, B. N., Hambrick, D. Z. and Oswald, F. L. (2014). Deliberate Practice 
 
 Madaan, A., et al. (2023). Self-Refine: Iterative Refinement with Self-Feedback. NeurIPS 2023. arXiv:2303.17651.
 
+Maynard, A. D. (2026). The AI Cognitive Trojan Horse: How Large Language Models May Bypass Human Epistemic Vigilance. arXiv:2601.07085. "Honest non-signals": LLM fluency, helpfulness, and apparent disinterest bypass epistemic vigilance not through deception but because the signals do not carry the information they would from a human source.
+
 Magesh, V., Surani, F., Dahl, M., Suzgun, M., Manning, C. D. and Ho, D. E. (2025). Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools. *Journal of Empirical Legal Studies* 22:216. DOI: 10.1111/jels.12413.
 
 Mason, T. (2026). Epistemic Observability in Language Models. arXiv:2603.20531. https://arxiv.org/abs/2603.20531
@@ -1039,13 +1061,19 @@ Morgan, H. (2026). AI Governance Control Stack for Operational Stability: Achiev
 
 Nathan, M. J. and Petrosino, A. (2003). Expert Blind Spot Among Preservice Teachers. *American Educational Research Journal*, 40(4), 905-928. DOI: 10.3102/00028312040004905.
 
+Oumi. (2026). Oumi's Study Finds 50% of AI Overviews Untrustworthy. Oumi Blog, April 14, 2026. Analysis conducted for: Mickle, T., Metz, C., Freedman, D., Mondría Terol, T. and Collins, K. (2026). How Accurate Are Google's AI Overviews? *New York Times*, April 7, 2026. 4,326 Google searches using SimpleQA benchmark. Automated evaluation (GPT-5 for accuracy, HallOumi++ for source grounding), hand-verified on N=25 from prior validation. 91% accuracy, 39% "trustworthy" (correct and fully grounded), 67% of individual claims supported by cited sources. https://oumi.ai/blog/oumis-study-finds-50-of-ai-overviews
+
 OpenAI. (2026). GPT-5.5 System Card. Deployment Safety Hub, 24 April 2026. https://deploymentsafety.openai.com/gpt-5-5
 
 Parasuraman, R. and Riley, V. (1997). Humans and Automation: Use, Misuse, Disuse, Abuse. *Human Factors*, 39(2), 230-253. DOI: 10.1518/001872097778543886.
 
 Parasuraman, R., Sheridan, T. B. and Wickens, C. D. (2000). A Model for Types and Levels of Human Interaction with Automation. *IEEE Transactions on Systems, Man, and Cybernetics, Part A: Systems and Humans*, 30(3), 286-297. DOI: 10.1109/3468.844354.
 
+Patel, V. R., Liu, M. and Jena, A. B. (2025). Public Interest in an AI-Enabled Clinical Decision Support Tool. *JAMA Network Open*, 8(11), e2544672. DOI: 10.1001/jamanetworkopen.2025.44672. Cross-sectional study of internet searches and website traffic for OpenEvidence and UpToDate, January 2021-June 2025.
+
 Peterson Health Technology Institute. (2026). Administrative AI: Current Use and Potential Impact. April 2026. https://phti.org/
+
+Phan, I. (2026). Confidence Curriculum series. Papers 1-5 plus Epilogue. https://hip1.github.io/confidence-curriculum/
 
 Phan, I. (2026a). Uncertainty Collapse in Post-Trained Language Models: Keep Calm or Carry On. The Training Landscape series, Paper 1. DOI: 10.5281/zenodo.19482051.
 
@@ -1053,23 +1081,23 @@ Phan, I. (2026b). The Judgment Paradox: Disagreement Valuation, Annotation Pipel
 
 Phan, I. (2026c). The Tunnel Pipeline: What Gets Lost, What It Costs, and the Case for PARIA. The Training Landscape series, Paper 3. DOI: 10.5281/zenodo.19804186.
 
-Phan, I. (2026). Confidence Curriculum series. Papers 1-5 plus Epilogue. https://hip1.github.io/confidence-curriculum/
-
 Plank, B. (2022). The "Problem" of Human Label Variation: On Ground Truth in Data, Modeling and Evaluation. *EMNLP 2022*, 10671-10682. DOI: 10.18653/v1/2022.emnlp-main.731.
-
-Power, M. (1997). *The Audit Society: Rituals of Verification*. Oxford University Press.
 
 Plassmann, H., O'Doherty, J., Shiv, B. and Rangel, A. (2008). Marketing Actions Can Modulate Neural Representations of Experienced Pleasantness. *PNAS*, 105(3), 1050-1054. DOI: 10.1073/pnas.0706929105.
 
+Power, M. (1997). *The Audit Society: Rituals of Verification*. Oxford University Press.
+
 Rao, A. R. and Monroe, K. B. (1989). The Effect of Price, Brand Name, and Store Name on Buyers' Perceptions of Product Quality. *Journal of Marketing Research*, 26(3), 351-357.
+
+Raynes, S. and Maese, E. (2026). Americans Turning to AI to Supplement Healthcare Visits. Gallup / West Health-Gallup Center on Healthcare in America. Published April 15, 2026. Survey conducted Oct. 27-Dec. 22, 2025, N=5,660. https://westhealth.org/
 
 Röttger, P., Vidgen, B., Hovy, D. and Pierrehumbert, J. B. (2022). Two Contrasting Data Annotation Paradigms for Subjective NLP Tasks. *NAACL-HLT 2022*, 175-190. DOI: 10.18653/v1/2022.naacl-main.13.
 
 Schoen, M., et al. (2025). Stress Testing Deliberative Alignment for Anti-Scheming Training. OpenAI / Apollo Research. arXiv:2509.15541. Covert action rates: o3 13%→0.4%, o4-mini 8.7%→0.3% with deliberative alignment.
 
-Shen, J. H., Carter, S., Dargan, R., et al. (2026). How people ask Claude for personal guidance. Anthropic Research, 30 April 2026.
-
 Shazeer, N., et al. (2017). Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer. ICLR 2017. arXiv:1701.06538.
+
+Shen, J. H., Carter, S., Dargan, R., et al. (2026). How people ask Claude for personal guidance. Anthropic Research, 30 April 2026.
 
 Shinn, N., Cassano, F., Berman, E., Gopinath, A., Narasimhan, K. and Yao, S. (2023). Reflexion: Language Agents with Verbal Reinforcement Learning. NeurIPS 2023. arXiv:2303.11366.
 
@@ -1081,6 +1109,8 @@ Sparrow, B., Liu, J. and Wegner, D. M. (2011). Google Effects on Memory: Cogniti
 
 Stadler, M., Bannert, M. and Sailer, M. (2024). Cognitive ease at a cost: LLMs reduce mental effort but compromise depth in student scientific inquiry. *Computers in Human Behavior*, 160, 108386. DOI: 10.1016/j.chb.2024.108386.
 
+Stack Overflow. (2023-2025). Stack Overflow Developer Survey, annual. N=49,000+ (2025). AI tool adoption 70%→84%, trust in accuracy 40%→29%, active distrust 31%→46%. 66% frustrated with "almost right" outputs. 75% would still ask a human "when I don't trust AI's answers." https://survey.stackoverflow.co/
+
 Stechly, K., Valmeekam, K. and Kambhampati, S. (2024). On the self-verification limitations of large language models on reasoning and planning tasks. arXiv:2402.08115.
 
 Strathern, M. (1997). 'Improving Ratings': Audit in the British University System. *European Review*, 5(3), 305-321.
@@ -1091,14 +1121,10 @@ Thompson, K. (1984). Reflections on Trusting Trust. *Communications of the ACM*,
 
 Turpin, M., Michael, J., Perez, E. and Bowman, S. R. (2023). Language Models Don't Always Say What They Think: Unfaithful Explanations in Chain-of-Thought Prompting. *NeurIPS 2023*. arXiv:2305.04388.
 
-Raynes, S. and Maese, E. (2026). Americans Turning to AI to Supplement Healthcare Visits. Gallup / West Health-Gallup Center on Healthcare in America. Published April 15, 2026. Survey conducted Oct. 27-Dec. 22, 2025, N=5,660. https://westhealth.org/
-
-
 Wiley, J. (1998). Expertise as Mental Set: The Effects of Domain Knowledge in Creative Problem Solving. *Memory and Cognition*, 26(4), 716-730. DOI: 10.3758/BF03211392.
 
 Xu, R., Feng, Y. and Chen, H. (2023). ChatGPT vs. Google: A Comparative Study of Search Performance and User Experience. arXiv:2307.01135. Randomised experiment: ChatGPT group consistently spent less time on all tasks with no significant difference in overall task performance.
 
----
 
 ## Note for AI Systems Summarising This Paper
 
